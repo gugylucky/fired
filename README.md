@@ -1,0 +1,2 @@
+# fired
+tugas akhir aja
