@@ -1,5 +1,10 @@
 # Ignore this file in this directory
 *.avi
+*.db
+*.mexw64
+Ancient Code
+Pengujian
+codegen
 
 # except this file
 !.gitignore
