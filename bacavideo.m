@@ -1,6 +1,13 @@
 function [ video_source, volumedata_RGB, volumedata_gray ] = bacavideo(path)
-%BACAVIDEO Summary of this function goes here
-%   Detailed explanation goes here
+%   fungsi ini untuk membaca file video frame per frame, dan disimpan
+%   kedalam sebuah variabel volumedata_RGB supaya bisa diakses dengan mudah
+%   dan cepat. frame juga sudah diubah kedalam format grayscale terlebih
+%   dahulu dan disimpan ke dalam variabel juga, dan nama variabel tersebut
+%   adalah volumedata_gray.
+%
+%   akan tetapi, output dari fungsi ini akan menghabiskan RAM anda, jauh
+%   lebih parah dari Google Chrome. proceed with caution. videonya
+%   semakin pendek semakin baik.
 
     video_source = VideoReader(path);
 

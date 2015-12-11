@@ -1,4 +1,15 @@
 function [ lokasi_baru, gambarRGB ] = findFirePixel( lokasi, gambarRGB )
+%   fungsi ini memfilter lokasi baru berdasarkan lokasi yg sudah ada, dimana
+%   lokasi baru tersebut merupakan lokasi dengan pixel berwarna api.
+%   input:
+%
+%   lokasi, merupakan lokasi sebelumnya. binary image.
+%   gambarRGB, gambar acuan untuk mencari pixel mana yg berwarna api.
+%
+%
+%   output:
+%   
+%   lokasi_baru, hasil dari lokasi tempat pixel yg berwarna api itu berada
 
 lokasi_baru = lokasi;
 %% find white pixel

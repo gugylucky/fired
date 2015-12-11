@@ -1,4 +1,5 @@
 function [ hsi ] = rgb2hsi(x)
+% fungsi ini merubah format rgb ke hsi. sudah jelas.
     F=im2double(x);
     %% get r,g,b value
     r=F(:,:,1);

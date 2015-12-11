@@ -20,7 +20,7 @@ function varargout = Demo(varargin)
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Last Modified by GUIDE v2.5 16-Jun-2015 19:35:49
+% Last Modified by GUIDE v2.5 11-Dec-2015 23:26:57
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -62,6 +62,8 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in browseButton.
 function browseButton_Callback(hObject, eventdata, handles)
+
+%% bersihin supaya tidak menuhin RAM
 clearvars -global volumedata_RGB;
 clearvars -global volumedata_gray;
 %% inisialisasi global
@@ -101,12 +103,12 @@ if path ~= 0
     set(handles.frameSlider,'max',numberOfFrames);
     set(handles.frameSlider,'value',thFrame);
 
-    % panel 1
+    % show in panel 1
     axes(handles.axesVideo1);
     imshow(uint8(volumedata_RGB(:,:,:,1)));
     axes(handles.axesVideo2);
     imshow(uint8(volumedata_RGB(:,:,:,1)));
-    % panel 2
+    % show in panel 2
     axes(handles.axes2);
     imshow(uint8(volumedata_RGB(:,:,:,1)));
     axes(handles.axes3);
@@ -116,6 +118,8 @@ if path ~= 0
 end
 
 % --- Executes on button press in nextButton.
+% --- tombol nextButton akan memproses frame selanjutnya untuk dideteksi.
+% --- bagian utama proses pendeteksian terletak pada fungsi nextFrame.
 function nextButton_Callback(hObject, eventdata, handles)
 %% inisialisasi
 global thFrame threshold volumedata_RGB volumedata_gray interval minimumPixel numberOfFrames;
@@ -128,7 +132,7 @@ global parameterLBPTOP Offset;
 if thFrame < numberOfFrames
     thFrame = thFrame + 1;
     [show, ~, finalBbox] = nextFrame( volumedata_RGB, volumedata_gray, thFrame, threshold, interval, minimumPixel, parameterLBPTOP, Offset );
-    % panel 2
+    % show in panel 2
     axes(handles.axes2);
     imshow(show.threeframe);
     axes(handles.axes3);
@@ -142,6 +146,8 @@ if thFrame < numberOfFrames
 end
 
 % --- Executes on button press in prevButton.
+% --- tombol prevButton akan memproses frame sebelumnya untuk dideteksi.
+% --- bagian utama proses pendeteksian terletak pada fungsi nextFrame.
 function prevButton_Callback(hObject, eventdata, handles)
 %% inisialisasi
 global thFrame threshold volumedata_RGB volumedata_gray interval minimumPixel numberOfFrames;
@@ -154,7 +160,7 @@ global parameterLBPTOP Offset;
 if thFrame > 1+interval+interval
     thFrame = thFrame - 1;
     [show, ~, finalBbox] = nextFrame( volumedata_RGB, volumedata_gray, thFrame, threshold, interval, minimumPixel, parameterLBPTOP, Offset );
-    % panel 2
+    % show in panel 2
     axes(handles.axes2);
     imshow(show.threeframe);
     axes(handles.axes3);
@@ -188,7 +194,7 @@ if ~isempty(finalBbox)
         axes(handles.axes4);
         imshow(show.lbptopglcm);
     else
-        disp('index exceed');
+        disp('index exceeding the total number of bounding boxes');
     end
     if bboxIndex == size(finalBbox,1)
         bboxIndex = 0;
@@ -196,7 +202,7 @@ if ~isempty(finalBbox)
     bboxIndex = bboxIndex+1;
 end
 
-% displaying XY, XT, YT
+% displaying XY, XT, YT in a figure
 volData = volumedata_gray(thisBbox(2):thisBbox(2)+thisBbox(4),thisBbox(1):thisBbox(1)+thisBbox(3),thFrame-interval:thFrame+interval);
 [Planes,feature] = LBPTOPGLCM(volData, parameterLBPTOP(1), parameterLBPTOP(2), parameterLBPTOP(3), [parameterLBPTOP(6) parameterLBPTOP(7) parameterLBPTOP(8)], parameterLBPTOP(4), parameterLBPTOP(5), Offset);
 
@@ -250,6 +256,8 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 % --- Executes on button press in toggleButton.
+% --- ini tombol play/pause. terbaik.
+% --- cc: Bening Qias Ranum, Gede Candrayana Giri
 function toggleButton_Callback(hObject, eventdata, handles)
 %% inisialisasi
 global threshold volumedata_RGB volumedata_gray interval minimumPixel numberOfFrames i parameterLBPTOP Offset;
@@ -259,12 +267,13 @@ if buttonState == get(hObject,'Max')
     set(handles.toggleButton,'String','Pause');
     set(handles.toggleButton,'UserData',1);
     for j = i : numberOfFrames
-        if get(handles.toggleButton,'UserData')==0
+        if get(handles.toggleButton,'UserData')==0  % if pause
             i = j;  % simpen indeks sebelum di break/pause
             break;
         end
-        % menampilkan frame
+        % memproses frame
         [show, ~, ~] = nextFrame( volumedata_RGB, volumedata_gray, j, threshold, interval, minimumPixel, parameterLBPTOP, Offset );
+        % dan menampilkan frame pada panel 1
         axes(handles.axesVideo1);
         imshow(uint8(volumedata_RGB(:,:,:,j)));
         axes(handles.axesVideo2);
@@ -276,7 +285,7 @@ if buttonState == get(hObject,'Max')
         set(handles.toggleButton,'value',0);
         i = 1+interval+interval;
     end
-elseif buttonState == get(hObject,'Min')
+elseif buttonState == get(hObject,'Min')    % if resume
     set(handles.toggleButton,'String','Resume');
     set(handles.toggleButton,'UserData',0);
 end

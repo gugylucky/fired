@@ -1,7 +1,9 @@
+% ini untuk pembangunan model KNN.
+
 clear all
 clc
 
-%% inisialisasi
+%% inisialisasi parameter
 T = 10;
 FxRadius = 3;
 FyRadius = 3;
@@ -32,7 +34,7 @@ for i=1:size(folder,1)
         else
             classtrain(index) = 0;
         end
-        index = index+1;
+        index = index + 1;
         disp(index);
     end
 end

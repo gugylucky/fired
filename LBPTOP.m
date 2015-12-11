@@ -1,7 +1,4 @@
 function [Planes,feature] = LBPTOPGLCM(VolData, FxRadius, FyRadius, TInterval, NeighborPoints, TimeLength, BorderLength)
-%#codegen
-coder.inline('never');
-
 %  This function is to compute the LBP-TOP features for a video sequence
 %  Reference:
 %  Guoying Zhao, Matti Pietikainen, "Dynamic texture recognition using local binary patterns
