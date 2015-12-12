@@ -62,13 +62,8 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in browseButton.
 function browseButton_Callback(hObject, eventdata, handles)
-
-%% bersihin supaya tidak menuhin RAM
-clearvars -global volumedata_RGB;
-clearvars -global volumedata_gray;
 %% inisialisasi global
-global video_source numberOfFrames;
-global volumedata_RGB volumedata_gray;
+global video_source datavideo numberOfFrames;
 global threshold interval minimumPixel;
 global thFrame i;
 global parameterLBPTOP Offset;
@@ -77,7 +72,7 @@ global parameterLBPTOP Offset;
 [filename, path] = uigetfile({'*.avi*'},'pilih video');
 if path ~= 0
     %baca video, masukkan frame ke volumedata
-    [video_source, volumedata_RGB, volumedata_gray] = bacavideo([path filename]);
+    [video_source, datavideo] = bacavideo([path filename]);
     numberOfFrames = video_source.NumberOfFrames;
     
     % init parameter three-frame
@@ -105,16 +100,16 @@ if path ~= 0
 
     % show in panel 1
     axes(handles.axesVideo1);
-    imshow(uint8(volumedata_RGB(:,:,:,1)));
+    imshow(uint8(datavideo.volumedata_RGB(:,:,:,1)));
     axes(handles.axesVideo2);
-    imshow(uint8(volumedata_RGB(:,:,:,1)));
+    imshow(uint8(datavideo.volumedata_RGB(:,:,:,1)));
     % show in panel 2
     axes(handles.axes2);
-    imshow(uint8(volumedata_RGB(:,:,:,1)));
+    imshow(uint8(datavideo.volumedata_RGB(:,:,:,1)));
     axes(handles.axes3);
-    imshow(uint8(volumedata_RGB(:,:,:,1)));
+    imshow(uint8(datavideo.volumedata_RGB(:,:,:,1)));
     axes(handles.axes4);
-    imshow(uint8(volumedata_RGB(:,:,:,1)));
+    imshow(uint8(datavideo.volumedata_RGB(:,:,:,1)));
 end
 
 % --- Executes on button press in nextButton.
@@ -122,7 +117,7 @@ end
 % --- bagian utama proses pendeteksian terletak pada fungsi nextFrame.
 function nextButton_Callback(hObject, eventdata, handles)
 %% inisialisasi
-global thFrame threshold volumedata_RGB volumedata_gray interval minimumPixel numberOfFrames;
+global thFrame threshold datavideo interval minimumPixel numberOfFrames;
 % bbox
 global finalBbox bboxIndex show;
 bboxIndex = 1;
@@ -131,7 +126,7 @@ global parameterLBPTOP Offset;
 
 if thFrame < numberOfFrames
     thFrame = thFrame + 1;
-    [show, ~, finalBbox] = nextFrame( volumedata_RGB, volumedata_gray, thFrame, threshold, interval, minimumPixel, parameterLBPTOP, Offset );
+    [show, ~, finalBbox] = nextFrame( datavideo, thFrame, threshold, interval, minimumPixel, parameterLBPTOP, Offset );
     % show in panel 2
     axes(handles.axes2);
     imshow(show.threeframe);
@@ -139,7 +134,6 @@ if thFrame < numberOfFrames
     imshow(show.firecolor);
     axes(handles.axes4);
     imshow(show.lbptopglcm);
-    imwrite(show.lbptopglcm,'tes.bmp');
 
     set(handles.frameSlider,'value',thFrame);
     set(handles.frameNumberTextField,'String',int2str(thFrame));
@@ -150,7 +144,7 @@ end
 % --- bagian utama proses pendeteksian terletak pada fungsi nextFrame.
 function prevButton_Callback(hObject, eventdata, handles)
 %% inisialisasi
-global thFrame threshold volumedata_RGB volumedata_gray interval minimumPixel numberOfFrames;
+global thFrame threshold datavideo interval minimumPixel;
 % bbox
 global finalBbox bboxIndex show;
 bboxIndex = 1;
@@ -159,7 +153,7 @@ global parameterLBPTOP Offset;
 
 if thFrame > 1+interval+interval
     thFrame = thFrame - 1;
-    [show, ~, finalBbox] = nextFrame( volumedata_RGB, volumedata_gray, thFrame, threshold, interval, minimumPixel, parameterLBPTOP, Offset );
+    [show, ~, finalBbox] = nextFrame( datavideo, thFrame, threshold, interval, minimumPixel, parameterLBPTOP, Offset );
     % show in panel 2
     axes(handles.axes2);
     imshow(show.threeframe);
@@ -175,21 +169,21 @@ end
 % --- Executes on button press in detailButton.
 function detailButton_Callback(hObject, eventdata, handles)
 %% inisialisasi
-global thFrame interval volumedata_gray parameterLBPTOP Offset finalBbox bboxIndex show;
+global thFrame interval datavideo parameterLBPTOP Offset finalBbox bboxIndex show;
 
 % selecting and displaying current boundingbox
 if ~isempty(finalBbox)
     if bboxIndex == 1
-        prevBbox = finalBbox(size(finalBbox,1),:);
+        prevBbox        = finalBbox(size(finalBbox,1),:);
         show.lbptopglcm = insertShape(show.lbptopglcm,'Rectangle',[prevBbox(1),prevBbox(2),prevBbox(3),prevBbox(4)], 'color', 'red');
-        thisBbox = finalBbox(bboxIndex,:);
+        thisBbox        = finalBbox(bboxIndex,:);
         show.lbptopglcm = insertShape(show.lbptopglcm,'Rectangle',[thisBbox(1),thisBbox(2),thisBbox(3),thisBbox(4)], 'color', 'green');
         axes(handles.axes4);
         imshow(show.lbptopglcm);
     elseif bboxIndex <= size(finalBbox,1) && bboxIndex > 1
-        prevBbox = finalBbox(bboxIndex-1,:);
+        prevBbox        = finalBbox(bboxIndex-1,:);
         show.lbptopglcm = insertShape(show.lbptopglcm,'Rectangle',[prevBbox(1),prevBbox(2),prevBbox(3),prevBbox(4)], 'color', 'red');
-        thisBbox = finalBbox(bboxIndex,:);
+        thisBbox        = finalBbox(bboxIndex,:);
         show.lbptopglcm = insertShape(show.lbptopglcm,'Rectangle',[thisBbox(1),thisBbox(2),thisBbox(3),thisBbox(4)], 'color', 'green');
         axes(handles.axes4);
         imshow(show.lbptopglcm);
@@ -203,13 +197,13 @@ if ~isempty(finalBbox)
 end
 
 % displaying XY, XT, YT in a figure
-volData = volumedata_gray(thisBbox(2):thisBbox(2)+thisBbox(4),thisBbox(1):thisBbox(1)+thisBbox(3),thFrame-interval:thFrame+interval);
+volData = datavideo.volumedata_gray(thisBbox(2):thisBbox(2)+thisBbox(4),thisBbox(1):thisBbox(1)+thisBbox(3),thFrame-interval:thFrame+interval);
 [Planes,feature] = LBPTOPGLCM(volData, parameterLBPTOP(1), parameterLBPTOP(2), parameterLBPTOP(3), [parameterLBPTOP(6) parameterLBPTOP(7) parameterLBPTOP(8)], parameterLBPTOP(4), parameterLBPTOP(5), Offset);
 
-formatSpec = '\n Contrast : %f\n Correlation : %f\n Energy : %f\n Homogenity : %f\n';
-stringXY = sprintf(formatSpec,feature(1:4));
-stringYT = sprintf(formatSpec,feature(5:8));
-stringXT = sprintf(formatSpec,feature(9:12));
+formatSpec  = '\n Contrast : %f\n Correlation : %f\n Energy : %f\n Homogenity : %f\n';
+stringXY    = sprintf(formatSpec,feature(1:4));
+stringYT    = sprintf(formatSpec,feature(5:8));
+stringXT    = sprintf(formatSpec,feature(9:12));
 
 figure(),
     subplot(3,2,1),imshow(Planes.XYplaneLBP),title('XY');
@@ -260,7 +254,7 @@ end
 % --- cc: Bening Qias Ranum, Gede Candrayana Giri
 function toggleButton_Callback(hObject, eventdata, handles)
 %% inisialisasi
-global threshold volumedata_RGB volumedata_gray interval minimumPixel numberOfFrames i parameterLBPTOP Offset;
+global threshold datavideo interval minimumPixel numberOfFrames i parameterLBPTOP Offset;
 
 buttonState = get(hObject,'value');
 if buttonState == get(hObject,'Max')
@@ -272,10 +266,12 @@ if buttonState == get(hObject,'Max')
             break;
         end
         % memproses frame
-        [show, ~, ~] = nextFrame( volumedata_RGB, volumedata_gray, j, threshold, interval, minimumPixel, parameterLBPTOP, Offset );
+        tic
+        [show, ~, ~] = nextFrame( datavideo, j, threshold, interval, minimumPixel, parameterLBPTOP, Offset );
+        toc
         % dan menampilkan frame pada panel 1
         axes(handles.axesVideo1);
-        imshow(uint8(volumedata_RGB(:,:,:,j)));
+        imshow(uint8(datavideo.volumedata_RGB(:,:,:,j)));
         axes(handles.axesVideo2);
         imshow(show.lbptopglcm);
     end
