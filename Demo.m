@@ -81,22 +81,22 @@ if path ~= 0
     numberOfFrames = video_source.NumberOfFrames;
     
     % init parameter three-frame
-    threshold = 5;
-    interval = 10;
-    minimumPixel = 10;
+    threshold       = 5;
+    interval        = 10;
+    minimumPixel    = 10;
     % init i dan thFrame
     thFrame = 1+interval+interval;
-    i = 1+interval+interval;
+    i       = 1+interval+interval;
     % init parameter LBPTOP GLCM
-    FxRadius = 3;
-    FyRadius = 3;
-    TInterval = 3;
-    TimeLength = 3;
-    BorderLength = 3;
-    NeighborPoints = [8 8 8];
-    T = 10;
+    FxRadius        = 3;
+    FyRadius        = 3;
+    TInterval       = 3;
+    TimeLength      = 3;
+    BorderLength    = 3;
+    NeighborPoints  = [8 8 8];
+    T               = 10;
     parameterLBPTOP = [FxRadius; FyRadius; TInterval; TimeLength; BorderLength; NeighborPoints(1); NeighborPoints(2); NeighborPoints(3); T;];
-    Offset = [0 1] * 4;
+    Offset          = [0 1] * 4;
     % init slider
     set(handles.frameNumberTextField,'String',int2str(thFrame));
     set(handles.frameSlider,'min',thFrame);
@@ -139,7 +139,6 @@ if thFrame < numberOfFrames
     imshow(show.firecolor);
     axes(handles.axes4);
     imshow(show.lbptopglcm);
-    imwrite(show.lbptopglcm,'tes.bmp');
 
     set(handles.frameSlider,'value',thFrame);
     set(handles.frameNumberTextField,'String',int2str(thFrame));
@@ -180,16 +179,16 @@ global thFrame interval volumedata_gray parameterLBPTOP Offset finalBbox bboxInd
 % selecting and displaying current boundingbox
 if ~isempty(finalBbox)
     if bboxIndex == 1
-        prevBbox = finalBbox(size(finalBbox,1),:);
+        prevBbox        = finalBbox(size(finalBbox,1),:);
         show.lbptopglcm = insertShape(show.lbptopglcm,'Rectangle',[prevBbox(1),prevBbox(2),prevBbox(3),prevBbox(4)], 'color', 'red');
-        thisBbox = finalBbox(bboxIndex,:);
+        thisBbox        = finalBbox(bboxIndex,:);
         show.lbptopglcm = insertShape(show.lbptopglcm,'Rectangle',[thisBbox(1),thisBbox(2),thisBbox(3),thisBbox(4)], 'color', 'green');
         axes(handles.axes4);
         imshow(show.lbptopglcm);
     elseif bboxIndex <= size(finalBbox,1) && bboxIndex > 1
-        prevBbox = finalBbox(bboxIndex-1,:);
+        prevBbox        = finalBbox(bboxIndex-1,:);
         show.lbptopglcm = insertShape(show.lbptopglcm,'Rectangle',[prevBbox(1),prevBbox(2),prevBbox(3),prevBbox(4)], 'color', 'red');
-        thisBbox = finalBbox(bboxIndex,:);
+        thisBbox        = finalBbox(bboxIndex,:);
         show.lbptopglcm = insertShape(show.lbptopglcm,'Rectangle',[thisBbox(1),thisBbox(2),thisBbox(3),thisBbox(4)], 'color', 'green');
         axes(handles.axes4);
         imshow(show.lbptopglcm);
@@ -203,13 +202,13 @@ if ~isempty(finalBbox)
 end
 
 % displaying XY, XT, YT in a figure
-volData = volumedata_gray(thisBbox(2):thisBbox(2)+thisBbox(4),thisBbox(1):thisBbox(1)+thisBbox(3),thFrame-interval:thFrame+interval);
-[Planes,feature] = LBPTOPGLCM(volData, parameterLBPTOP(1), parameterLBPTOP(2), parameterLBPTOP(3), [parameterLBPTOP(6) parameterLBPTOP(7) parameterLBPTOP(8)], parameterLBPTOP(4), parameterLBPTOP(5), Offset);
+volData             = volumedata_gray(thisBbox(2):thisBbox(2)+thisBbox(4),thisBbox(1):thisBbox(1)+thisBbox(3),thFrame-interval:thFrame+interval);
+[Planes,feature]    = LBPTOPGLCM(volData, parameterLBPTOP(1), parameterLBPTOP(2), parameterLBPTOP(3), [parameterLBPTOP(6) parameterLBPTOP(7) parameterLBPTOP(8)], parameterLBPTOP(4), parameterLBPTOP(5), Offset);
 
-formatSpec = '\n Contrast : %f\n Correlation : %f\n Energy : %f\n Homogenity : %f\n';
-stringXY = sprintf(formatSpec,feature(1:4));
-stringYT = sprintf(formatSpec,feature(5:8));
-stringXT = sprintf(formatSpec,feature(9:12));
+formatSpec  = '\n Contrast : %f\n Correlation : %f\n Energy : %f\n Homogenity : %f\n';
+stringXY    = sprintf(formatSpec,feature(1:4));
+stringYT    = sprintf(formatSpec,feature(5:8));
+stringXT    = sprintf(formatSpec,feature(9:12));
 
 figure(),
     subplot(3,2,1),imshow(Planes.XYplaneLBP),title('XY');
@@ -272,7 +271,9 @@ if buttonState == get(hObject,'Max')
             break;
         end
         % memproses frame
+        tic
         [show, ~, ~] = nextFrame( volumedata_RGB, volumedata_gray, j, threshold, interval, minimumPixel, parameterLBPTOP, Offset );
+        toc
         % dan menampilkan frame pada panel 1
         axes(handles.axesVideo1);
         imshow(uint8(volumedata_RGB(:,:,:,j)));
