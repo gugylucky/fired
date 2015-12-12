@@ -46,7 +46,7 @@ for k = 1 : length(bbox)
     thisArea = area(k).Area;
     thisBbox = uint8(bbox(k).BoundingBox);
 
-    if thisArea>=minimumPixel   % jika ukuran boundingbox < minimumPixel gak diproses
+    if thisArea >= minimumPixel   % jika ukuran boundingbox < minimumPixel gak diproses
         flag.moving         = 1;
         jumshow_threeframe  = jumshow_threeframe+1;
         show.threeframe     = insertShape(show.threeframe,'Rectangle',[thisBbox(1),thisBbox(2),thisBbox(3),thisBbox(4)], 'color', 'red');

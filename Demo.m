@@ -72,26 +72,26 @@ global parameterLBPTOP Offset;
 [filename, path] = uigetfile({'*.avi*'},'pilih video');
 if path ~= 0
     %baca video, masukkan frame ke volumedata
-    [video_source, datavideo] = bacavideo([path filename]);
-    numberOfFrames = video_source.NumberOfFrames;
+    [video_source, datavideo]   = bacavideo([path filename]);
+    numberOfFrames              = video_source.NumberOfFrames;
     
     % init parameter three-frame
-    threshold = 5;
-    interval = 10;
-    minimumPixel = 10;
+    threshold       = 5;
+    interval        = 10;
+    minimumPixel    = 10;
     % init i dan thFrame
     thFrame = 1+interval+interval;
-    i = 1+interval+interval;
+    i       = 1+interval+interval;
     % init parameter LBPTOP GLCM
-    FxRadius = 3;
-    FyRadius = 3;
-    TInterval = 3;
-    TimeLength = 3;
-    BorderLength = 3;
-    NeighborPoints = [8 8 8];
-    T = 10;
+    FxRadius        = 3;
+    FyRadius        = 3;
+    TInterval       = 3;
+    TimeLength      = 3;
+    BorderLength    = 3;
+    NeighborPoints  = [8 8 8];
+    T               = 10;
     parameterLBPTOP = [FxRadius; FyRadius; TInterval; TimeLength; BorderLength; NeighborPoints(1); NeighborPoints(2); NeighborPoints(3); T;];
-    Offset = [0 1] * 4;
+    Offset          = [0 1] * 4;
     % init slider
     set(handles.frameNumberTextField,'String',int2str(thFrame));
     set(handles.frameSlider,'min',thFrame);
@@ -197,8 +197,8 @@ if ~isempty(finalBbox)
 end
 
 % displaying XY, XT, YT in a figure
-volData = datavideo.volumedata_gray(thisBbox(2):thisBbox(2)+thisBbox(4),thisBbox(1):thisBbox(1)+thisBbox(3),thFrame-interval:thFrame+interval);
-[Planes,feature] = LBPTOPGLCM(volData, parameterLBPTOP(1), parameterLBPTOP(2), parameterLBPTOP(3), [parameterLBPTOP(6) parameterLBPTOP(7) parameterLBPTOP(8)], parameterLBPTOP(4), parameterLBPTOP(5), Offset);
+volData             = datavideo.volumedata_gray(thisBbox(2):thisBbox(2)+thisBbox(4),thisBbox(1):thisBbox(1)+thisBbox(3),thFrame-interval:thFrame+interval);
+[Planes,feature]    = LBPTOPGLCM(volData, parameterLBPTOP(1), parameterLBPTOP(2), parameterLBPTOP(3), [parameterLBPTOP(6) parameterLBPTOP(7) parameterLBPTOP(8)], parameterLBPTOP(4), parameterLBPTOP(5), Offset);
 
 formatSpec  = '\n Contrast : %f\n Correlation : %f\n Energy : %f\n Homogenity : %f\n';
 stringXY    = sprintf(formatSpec,feature(1:4));
